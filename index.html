@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO App with localStorage</title>
+  <style>
+    body {
+      background-color: aliceblue;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }
+
+    li {
+      list-style-type: none;
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input {
+      padding: 8px;
+    }
+
+    button {
+      background-color: rgba(114, 114, 255, 0.871);
+      border: none;
+      padding: 6px 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .removeBtn {
+      background-color: rgba(220, 20, 60, 0.405);
+    }
+
+    #todoList {
+      background-color: rgba(127, 255, 212, 0.169);
+      padding: 10px;
+      width: 300px;
+      margin-top: 20px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>TODO APP</h2>
+
+  <div>
+    <input type="text" id="addInput" placeholder="Enter task">
+    <button id="addBtn">Add</button>
+    <div id="errorMsg" class="error"></div>
+  </div>
+
+  <ul id="todoList"></ul>
+
+  <script>
+    const addBtn = document.getElementById("addBtn");
+    const addInput = document.getElementById("addInput");
+    const todoList = document.getElementById("todoList");
+    const errorMsg = document.getElementById("errorMsg");
+
+    // Load tasks from localStorage on page load
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    renderTasks();
+
+    // Add Task
+    addBtn.addEventListener("click", function () {
+      const task = addInput.value.trim();
+
+      // Validation
+      if (task === "") {
+        errorMsg.textContent = "Task cannot be empty!";
+        return;
+      } else if (task.length < 3) {
+        errorMsg.textContent = "Task must be at least 3 characters!";
+        return;
+      }
+
+      errorMsg.textContent = "";
+
+      tasks.push(task); // Add to array
+      localStorage.setItem("tasks", JSON.stringify(tasks)); // Save to localStorage
+      renderTasks();
+
+      addInput.value = "";
+    });
+
+    // Render Tasks
+    function renderTasks() {
+      todoList.innerHTML = "";
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.textContent = task;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "❌";
+        removeBtn.className = "removeBtn";
+
+        removeBtn.addEventListener("click", function () {
+          tasks.splice(index, 1); // Remove from array
+          localStorage.setItem("tasks", JSON.stringify(tasks)); // Update localStorage
+          renderTasks();
+        });
+
+        li.appendChild(span);
+        li.appendChild(removeBtn);
+        todoList.appendChild(li);
+      });
+    }
+
+    // Optional: Enter key support
+    addInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        addBtn.click();
+      }
+    });
+  </script>
+
+</body>
+</html>
